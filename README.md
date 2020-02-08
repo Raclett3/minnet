@@ -1,4 +1,3 @@
-Minnet
-===
+# Minnet
 
 Simple ActivityPub implementation

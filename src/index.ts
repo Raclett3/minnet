@@ -1,3 +1,3 @@
 (() => {
-    console.log("Minnet v0.0.0");
+  console.log('Minnet v0.0.0');
 })();
