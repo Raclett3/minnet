@@ -1,4 +1,4 @@
 !*.js
 !*.ts
-dist/
+build/
 node_modules/
