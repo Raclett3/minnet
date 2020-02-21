@@ -1,5 +1,3 @@
-import { unlinkSync, writeFileSync } from 'fs';
-
 import * as Config from '../src/config';
 
 describe('Config', () => {
@@ -15,12 +13,10 @@ describe('Config', () => {
   });
 
   test('Configのキャッシュ', () => {
-    expect.assertions(2);
+    expect.assertions(1);
 
-    writeFileSync(__dirname + '/resources/cache.json', '{"host": "example.com"}');
-    expect(Config.loadConfig(__dirname + '/resources/cache.json')).toMatchObject(config);
-    unlinkSync(__dirname + '/resources/cache.json');
-    expect(Config.loadConfig(__dirname + '/resources/cache.json')).toMatchObject(config);
+    Config.loadConfig(__dirname + '/resources/config-example.json');
+    expect(Config.configCache).toMatchObject(config);
   });
 
   test('Configのパース', () => {
