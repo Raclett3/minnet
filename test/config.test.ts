@@ -1,3 +1,5 @@
+import { unlinkSync, writeFileSync } from 'fs';
+
 import * as Config from '../src/config';
 
 describe('Config', () => {
@@ -10,6 +12,15 @@ describe('Config', () => {
     expect(() => Config.loadConfig(__dirname + '/resources/<0nf1g-3x4mple.json')).toThrowError(
       'Configファイルが存在しません。',
     );
+  });
+
+  test('Configのキャッシュ', () => {
+    expect.assertions(2);
+
+    writeFileSync(__dirname + '/resources/cache.json', '{"host": "example.com"}');
+    expect(Config.loadConfig(__dirname + '/resources/cache.json')).toMatchObject(config);
+    unlinkSync(__dirname + '/resources/cache.json');
+    expect(Config.loadConfig(__dirname + '/resources/cache.json')).toMatchObject(config);
   });
 
   test('Configのパース', () => {

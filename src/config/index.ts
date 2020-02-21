@@ -16,7 +16,13 @@ export function parseConfig(json: string): Config {
   }
 }
 
+const configCache: { [key: string]: Config } = {};
+
 export function loadConfig(filename: string): Config {
+  if (filename in configCache) {
+    return configCache[filename];
+  }
+
   if (!existsSync(filename)) {
     throw Error('Configファイルが存在しません。');
   }
@@ -27,6 +33,8 @@ export function loadConfig(filename: string): Config {
   if (!validateConfig(config)) {
     throw Error('Configファイルのプロパティのいくつかが不正です。');
   }
+
+  configCache[filename] = config;
 
   return config;
 }
