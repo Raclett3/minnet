@@ -1,20 +1,7 @@
-import fs from 'fs';
 import request from 'supertest';
 
+import { readFile } from '../src/helpers/async-fs';
 import app from '../src/server';
-
-async function readFile(filename: string): Promise<string> {
-  return await new Promise((resolve, reject) => {
-    fs.readFile(filename, (err, data) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      resolve(data.toString('utf-8'));
-    });
-  });
-}
 
 describe('Server', () => {
   test('Routes', async () => {
