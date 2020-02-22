@@ -3,6 +3,7 @@ import Koa from 'koa';
 import mount from 'koa-mount';
 import send from 'koa-send';
 
+import objects from './objects';
 import wellKnown from './well-known';
 
 const router = new Router();
@@ -15,5 +16,6 @@ const app = new Koa();
 app.use(router.routes());
 app.use(router.allowedMethods());
 app.use(mount(wellKnown));
+app.use(mount(objects));
 
 export default app;
