@@ -30,15 +30,17 @@ export default async (ctx: Koa.Context) => {
   const url = new URL(inReplyTo);
   const date = new Date();
   const actor = `https://${configCache.host}/users/asahi`;
+  const id = Math.floor(Math.random() * 10000000);
 
   const document = {
     '@context': 'https://www.w3.org/ns/activitystreams',
 
+    id: `https://${configCache.host}/create/${id}`,
     type: 'Create',
     actor: actor,
 
     object: {
-      id: `https://${configCache.host}/notes/${Math.floor(Math.random() * 10000000)}`,
+      id: `https://${configCache.host}/notes/${id}`,
       type: 'Note',
       published: date.toISOString(),
       attributedTo: actor,
@@ -53,7 +55,7 @@ export default async (ctx: Koa.Context) => {
   const digest = createHash('sha256')
     .update(JSON.stringify(document))
     .digest('base64');
-  const signedString = `host: ${url.host}\ndate: ${dateUTC}\ndigest: ${digest}`;
+  const signedString = `date: ${dateUTC}\ndigest: SHA-256=${digest}`;
   const signature = rsa.sign(signedString).toString('base64');
 
   try {
@@ -61,8 +63,8 @@ export default async (ctx: Koa.Context) => {
       headers: {
         Host: url.host,
         Date: dateUTC,
-        Digest: digest,
-        Signature: `keyId="${actor}",headers="host date digest",signature="${signature}",algorithm="rsa-sha256"`,
+        Digest: `SHA-256=${digest}`,
+        Signature: `keyId="${actor}",headers="date digest",signature="${signature}",algorithm="rsa-sha256"`,
       },
     });
     ctx.status = 204;
