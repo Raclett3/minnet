@@ -19,7 +19,7 @@ export async function createRemoteAccount(
   name: string,
   uri: string,
   inbox: string,
-): Promise<void> {
+): Promise<Account> {
   if (!validateUsername(username)) {
     throw new ControllerError('The username is invalid');
   }
@@ -40,10 +40,11 @@ export async function createRemoteAccount(
 
     const account = new Account(generateId(), username, host, name, uri, inbox);
     await transaction.insert(Account, account);
+    return account;
   });
 }
 
-export async function createLocalAccount(username: string, name: string): Promise<void> {
+export async function createLocalAccount(username: string, name: string): Promise<Account> {
   if (!validateUsername(username)) {
     throw new ControllerError('The username is invalid');
   }
@@ -56,6 +57,7 @@ export async function createLocalAccount(username: string, name: string): Promis
 
     const account = new Account(generateId(), username, null, name, null, null);
     await transaction.insert(Account, account);
+    return account;
   });
 }
 

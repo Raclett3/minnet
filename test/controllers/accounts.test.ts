@@ -11,42 +11,42 @@ describe('Accountsコントローラー', () => {
   test('ローカルアカウントの作成', async () => {
     expect.assertions(4);
 
-    expect(await Accounts.createLocalAccount('Asahi', 'Asahi')).toBeUndefined();
-    expect(await Accounts.createLocalAccount('Fuyuko', 'Fuyuko')).toBeUndefined();
-    expect(await Accounts.createLocalAccount('asahi', 'asahi')).toBeUndefined();
+    await expect(Accounts.createLocalAccount('Asahi', 'Asahi')).resolves.not.toThrowError();
+    await expect(Accounts.createLocalAccount('Fuyuko', 'Fuyuko')).resolves.not.toThrowError();
+    await expect(Accounts.createLocalAccount('asahi', 'asahi')).resolves.not.toThrowError();
     await expect(Accounts.createLocalAccount('Asahi', 'Asahi')).rejects.toThrowError();
   });
 
   test('リモートアカウントの作成', async () => {
     expect.assertions(4);
 
-    expect(
-      await Accounts.createRemoteAccount(
+    await expect(
+      Accounts.createRemoteAccount(
         'Asahi',
         'example.com',
         'Asahi',
         'https://example.com/Asahi',
         'https://example.com/inbox',
       ),
-    ).toBeUndefined();
-    expect(
-      await Accounts.createRemoteAccount(
+    ).resolves.not.toThrowError();
+    await expect(
+      Accounts.createRemoteAccount(
         'Fuyuko',
         'example.com',
         'Fuyuko',
         'https://example.com/Fuyuko',
         'https://example.com/inbox',
       ),
-    ).toBeUndefined();
-    expect(
-      await Accounts.createRemoteAccount(
+    ).resolves.not.toThrowError();
+    await expect(
+      Accounts.createRemoteAccount(
         'asahi',
         'example.com',
         'Asahi',
         'https://example.com/asahi',
         'https://example.com/inbox',
       ),
-    ).toBeUndefined();
+    ).resolves.not.toThrowError();
     await expect(
       Accounts.createRemoteAccount(
         'Asahi',
