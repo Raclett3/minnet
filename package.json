@@ -15,7 +15,7 @@
     "lint:eslint": "eslint --ext js,ts .",
     "lint:prettier": "prettier -l \"**/*.{json,md}\"",
     "start": "node build/index.js",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "author": "Raclett3 <im@s283.net>",
   "license": "MIT",
