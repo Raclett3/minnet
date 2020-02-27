@@ -1,9 +1,12 @@
+import * as path from 'path';
+
+import { loadConfig } from '../../src/config';
 import * as Accounts from '../../src/controllers/accounts';
 import { initPostgres } from '../../src/postgres';
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test';
-  console.log('Hello');
+  loadConfig(path.resolve(__dirname, '../resources/config-example.json'));
   await initPostgres();
 });
 
