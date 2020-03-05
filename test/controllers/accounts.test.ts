@@ -1,7 +1,9 @@
 import * as path from 'path';
+import { getRepository } from 'typeorm';
 
 import { loadConfig } from '../../src/config';
 import * as Accounts from '../../src/controllers/accounts';
+import { Account } from '../../src/entities/account';
 import { initPostgres } from '../../src/postgres';
 
 beforeAll(async () => {
@@ -12,44 +14,89 @@ beforeAll(async () => {
 
 describe('Accountsコントローラー', () => {
   test('ローカルアカウントの作成', async () => {
-    expect.assertions(4);
+    const repository = getRepository(Account);
+    expect.assertions(5);
 
-    await expect(Accounts.createLocalAccount('Asahi', 'Asahi')).resolves.not.toThrowError();
-    await expect(Accounts.createLocalAccount('Fuyuko', 'Fuyuko')).resolves.not.toThrowError();
-    await expect(Accounts.createLocalAccount('asahi', 'asahi')).resolves.not.toThrowError();
+    expect(await Accounts.createLocalAccount('Asahi', 'Asahi')).toMatchObject({
+      username: 'Asahi',
+      host: null,
+      name: 'Asahi',
+      uri: null,
+      inbox: null,
+    });
+    expect(await Accounts.createLocalAccount('Fuyuko', 'Fuyuko')).toMatchObject({
+      username: 'Fuyuko',
+      host: null,
+      name: 'Fuyuko',
+      uri: null,
+      inbox: null,
+    });
+    expect(await Accounts.createLocalAccount('asahi', 'asahi')).toMatchObject({
+      username: 'asahi',
+      host: null,
+      name: 'asahi',
+      uri: null,
+      inbox: null,
+    });
     await expect(Accounts.createLocalAccount('Asahi', 'Asahi')).rejects.toThrowError();
+    expect(await repository.findOne({ username: 'asahi', host: null })).toMatchObject({
+      username: 'asahi',
+      host: null,
+      name: 'asahi',
+      uri: null,
+      inbox: null,
+    });
   });
 
   test('リモートアカウントの作成', async () => {
-    expect.assertions(4);
+    const repository = getRepository(Account);
+    expect.assertions(5);
 
-    await expect(
-      Accounts.createRemoteAccount(
+    expect(
+      await Accounts.createRemoteAccount(
         'Asahi',
         'example.com',
         'Asahi',
         'https://example.com/Asahi',
         'https://example.com/inbox',
       ),
-    ).resolves.not.toThrowError();
-    await expect(
-      Accounts.createRemoteAccount(
+    ).toMatchObject({
+      username: 'Asahi',
+      host: 'example.com',
+      name: 'Asahi',
+      uri: 'https://example.com/Asahi',
+      inbox: 'https://example.com/inbox',
+    });
+    expect(
+      await Accounts.createRemoteAccount(
         'Fuyuko',
         'example.com',
         'Fuyuko',
         'https://example.com/Fuyuko',
         'https://example.com/inbox',
       ),
-    ).resolves.not.toThrowError();
-    await expect(
-      Accounts.createRemoteAccount(
+    ).toMatchObject({
+      username: 'Fuyuko',
+      host: 'example.com',
+      name: 'Fuyuko',
+      uri: 'https://example.com/Fuyuko',
+      inbox: 'https://example.com/inbox',
+    });
+    expect(
+      await Accounts.createRemoteAccount(
         'asahi',
         'example.com',
         'Asahi',
         'https://example.com/asahi',
         'https://example.com/inbox',
       ),
-    ).resolves.not.toThrowError();
+    ).toMatchObject({
+      username: 'asahi',
+      host: 'example.com',
+      name: 'Asahi',
+      uri: 'https://example.com/asahi',
+      inbox: 'https://example.com/inbox',
+    });
     await expect(
       Accounts.createRemoteAccount(
         'Asahi',
@@ -59,26 +106,12 @@ describe('Accountsコントローラー', () => {
         'https://example.com/inbox',
       ),
     ).rejects.toThrowError();
-  });
-
-  test('アカウントの検索', async () => {
-    expect.assertions(4);
-
-    expect(await Accounts.findAccount('Asahi')).toMatchObject({
-      username: 'Asahi',
-      host: null,
-      name: 'Asahi',
-      uri: null,
-      inbox: null,
-    });
-    expect(await Accounts.findAccount('Asahi', 'example.com')).toMatchObject({
-      username: 'Asahi',
+    expect(await repository.findOne({ username: 'Fuyuko', host: 'example.com' })).toMatchObject({
+      username: 'Fuyuko',
       host: 'example.com',
-      name: 'Asahi',
-      uri: 'https://example.com/Asahi',
+      name: 'Fuyuko',
+      uri: 'https://example.com/Fuyuko',
       inbox: 'https://example.com/inbox',
     });
-    expect(await Accounts.findAccount('fuyuko', 'example.com')).toBeUndefined();
-    expect(await Accounts.findAccount('Mei', 'example.com')).toBeUndefined();
   });
 });

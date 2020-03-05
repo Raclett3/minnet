@@ -60,11 +60,3 @@ export async function createLocalAccount(username: string, name: string): Promis
     return account;
   });
 }
-
-export async function findAccount(username: string, host: string | null = null): Promise<Account | undefined> {
-  return await getConnection().transaction(async transaction => {
-    const account = await transaction.findOne(Account, { username: username, host: host });
-
-    return account;
-  });
-}

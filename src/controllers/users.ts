@@ -79,11 +79,3 @@ export async function signIn(username: string, plainPassword: string): Promise<s
     return user.account.id;
   });
 }
-
-export async function findUser(username: string): Promise<User | undefined> {
-  return await getConnection().transaction(async transaction => {
-    const user = await transaction.findOne(User, { username: username });
-
-    return user;
-  });
-}
