@@ -2,8 +2,10 @@ import { getRepository } from 'typeorm';
 
 import { loadConfig } from '../src/config';
 import * as Accounts from '../src/controllers/accounts';
+import { createNote } from '../src/controllers/notes';
 import { signIn, signUp } from '../src/controllers/users';
 import { Account } from '../src/entities/account';
+import { Note } from '../src/entities/note';
 import { User } from '../src/entities/user';
 import { initPostgres } from '../src/postgres';
 
@@ -154,5 +156,22 @@ describe('Accountsコントローラー', () => {
       uri: 'https://example.com/Fuyuko',
       inbox: 'https://example.com/inbox',
     });
+  });
+});
+
+describe('Notesコントローラー', () => {
+  test('Noteの作成', async () => {
+    const repository = getRepository(Note);
+    expect.assertions(3);
+
+    expect(await createNote('kaho', null, "Everybody let's go!")).toMatchObject({
+      inReplyTo: null,
+      content: "Everybody let's go!",
+    });
+    expect(await createNote('kaho', null, "Everybody let's go!")).toMatchObject({
+      inReplyTo: null,
+      content: "Everybody let's go!",
+    });
+    expect(await repository.count()).toBe(2);
   });
 });
