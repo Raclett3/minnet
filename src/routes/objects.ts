@@ -1,8 +1,10 @@
 import Router from '@koa/router';
 import Koa from 'koa';
+import { getRepository } from 'typeorm';
 
 import { configCache } from '../config';
-import { readFile } from '../helpers/async-fs';
+import { User } from '../entities/user';
+import { appendContext, renderLocalPerson } from '../helpers/activitypub/renderer';
 
 const router = new Router();
 
@@ -12,21 +14,15 @@ router.get('/users/:user', async ctx => {
     return;
   }
 
-  ctx.body = {
-    '@context': ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1'],
+  const user = await getRepository(User).findOne({ username: ctx.params.user });
 
-    id: `https://${configCache.host}/users/asahi`,
-    type: 'Person',
-    preferredUsername: 'asahi',
-    name: 'Asahi the Super Dry',
-    inbox: `https://${configCache.host}/inbox`,
+  if (!user) {
+    ctx.status = 404;
+    ctx.body = {};
+    return;
+  }
 
-    publicKey: {
-      id: `https://${configCache.host}/users/asahi#main-key`,
-      owner: `https://${configCache.host}/users/asahi`,
-      publicKeyPem: await readFile(process.cwd() + '/public.pem'),
-    },
-  };
+  ctx.body = appendContext(renderLocalPerson(user.username, user.account.name, user.publicKey));
 });
 
 const app = new Koa();
