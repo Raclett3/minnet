@@ -3,6 +3,7 @@ import { URL } from 'url';
 
 import { configCache } from '../../../config';
 import { renderCreate, renderNote } from '../../../helpers/activitypub/renderer';
+import { generateId } from '../../../helpers/generate-id';
 import { deliver } from '../../../remote/deliver';
 
 export default async (ctx: Koa.Context) => {
@@ -28,7 +29,7 @@ export default async (ctx: Koa.Context) => {
   const url = new URL(inReplyTo);
   const date = new Date();
   const actor = `https://${configCache.host}/users/asahi`;
-  const id = String(Math.floor(Math.random() * 10000000));
+  const id = generateId();
 
   const document = renderCreate(actor, renderNote(id, date, actor, text, inReplyTo));
 
