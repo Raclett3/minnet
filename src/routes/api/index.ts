@@ -3,10 +3,12 @@ import Koa from 'koa';
 import body from 'koa-body';
 
 import notes from './notes';
+import users from './users';
 
 const router = new Router();
 
 router.use('/api/notes', notes.routes(), notes.allowedMethods());
+router.use('/api/users', users.routes(), users.allowedMethods());
 
 const app = new Koa();
 app.use(body());
