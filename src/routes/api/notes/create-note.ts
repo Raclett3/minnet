@@ -1,10 +1,11 @@
 import Koa from 'koa';
-import { URL } from 'url';
+import { getConnection } from 'typeorm';
 
 import { configCache } from '../../../config';
-import { renderCreate, renderNote } from '../../../helpers/activitypub/renderer';
+import { Account } from '../../../entities/account';
+import { Note } from '../../../entities/note';
 import { generateId } from '../../../helpers/generate-id';
-import { deliver } from '../../../remote/deliver';
+import { verifyJWT } from '../../../helpers/jwt-async';
 
 export default async (ctx: Koa.Context) => {
   if (!configCache) {
@@ -12,30 +13,31 @@ export default async (ctx: Koa.Context) => {
     return;
   }
 
-  const inReplyTo = ctx.request.body.in_reply_to;
   const text = ctx.request.body.text;
   const token = ctx.request.body.token;
 
-  if (typeof inReplyTo !== 'string' || typeof text !== 'string' || typeof token !== 'string') {
+  if (typeof text !== 'string' || typeof token !== 'string') {
     ctx.status = 400;
     return;
   }
 
-  if (token !== process.env.TOKEN) {
+  let accountId: string;
+  try {
+    accountId = await verifyJWT(token);
+  } catch (err) {
     ctx.status = 401;
     return;
   }
 
-  const url = new URL(inReplyTo);
-  const date = new Date();
-  const actor = `https://${configCache.host}/users/asahi`;
-  const id = generateId();
-
-  const document = renderCreate(actor, renderNote(id, date, actor, text, inReplyTo));
-
-  if (!deliver(actor, `${url.protocol}//${url.host}/inbox`, document)) {
-    ctx.status = 500;
+  const entityManager = getConnection().createEntityManager();
+  const account = await entityManager.findOne(Account, { id: accountId });
+  if (!account) {
+    ctx.status = 401;
+    return;
   }
+
+  const note = new Note(generateId(), new Date(), null, text, account);
+  entityManager.save(note);
 
   ctx.status = 204;
 };
