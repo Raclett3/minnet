@@ -36,7 +36,7 @@ export default async (ctx: Koa.Context) => {
     return;
   }
 
-  const note = new Note(generateId(), new Date(), null, text, account);
+  const note = new Note(generateId(), new Date(), null, text, account, null);
   entityManager.save(note);
 
   ctx.status = 204;

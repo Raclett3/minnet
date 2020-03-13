@@ -21,7 +21,7 @@ export async function createNote(username: string, host: string | null, content:
       inReplyTo = note;
     }
 
-    const note = new Note(generateId(), new Date(), inReplyTo, content, postedBy);
+    const note = new Note(generateId(), new Date(), inReplyTo, content, postedBy, null);
     console.log(note);
     await transaction.insert(Note, note);
     return note;
