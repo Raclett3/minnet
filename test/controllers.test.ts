@@ -2,11 +2,14 @@ import { getRepository } from 'typeorm';
 
 import { loadConfig } from '../src/config';
 import * as Accounts from '../src/controllers/accounts';
+import * as Follows from '../src/controllers/follows';
 import { createNote } from '../src/controllers/notes';
 import { signIn, signUp } from '../src/controllers/users';
 import { Account } from '../src/entities/account';
+import { Follow } from '../src/entities/follow';
 import { Note } from '../src/entities/note';
 import { User } from '../src/entities/user';
+import { generateId } from '../src/helpers/generate-id';
 import { initPostgres } from '../src/postgres';
 
 beforeAll(async () => {
@@ -173,5 +176,50 @@ describe('Notesコントローラー', () => {
       content: "Everybody let's go!",
     });
     expect(await repository.count()).toBe(2);
+  });
+});
+
+describe('Followコントローラー', () => {
+  const accounts: { [key: string]: Account } = {};
+  beforeAll(async () => {
+    const names = ['Yuika', 'Mamimi', 'Sakuya', 'Kiriko'];
+
+    for (const name of names) {
+      const account = await Accounts.createRemoteAccount(
+        name,
+        'example.com',
+        name,
+        `https://example.com/${name}`,
+        'https://example.com/inbox',
+      );
+
+      accounts[name] = account;
+    }
+
+    const account = await Accounts.createLocalAccount('Kogane', 'Kogane');
+    accounts['Kogane'] = account;
+  });
+
+  test('Followの作成', async () => {
+    expect.assertions(3);
+
+    const repository = getRepository(Follow);
+
+    expect(await repository.save(new Follow(generateId(), accounts['Mamimi'], accounts['Kogane']))).toMatchObject({
+      follower: accounts['Mamimi'],
+      followee: accounts['Kogane'],
+    });
+    expect(await repository.save(new Follow(generateId(), accounts['Kiriko'], accounts['Kogane']))).toMatchObject({
+      follower: accounts['Kiriko'],
+      followee: accounts['Kogane'],
+    });
+    await expect(
+      repository.save(new Follow(generateId(), accounts['Mamimi'], accounts['Kogane'])),
+    ).rejects.toThrowError();
+  });
+
+  test('Inbox一覧の取得', async () => {
+    expect(await Follows.followerInboxes(accounts['Kogane'].id)).toMatchObject(['https://example.com/inbox']);
+    expect(await Follows.followerInboxes('Mano')).toMatchObject([]);
   });
 });
