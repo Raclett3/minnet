@@ -192,11 +192,13 @@ describe('Notesコントローラー', () => {
     const repository = getRepository(Note);
     expect.assertions(3);
 
-    expect(await resolveEntity(await createNote('kaho', null, "Everybody let's go!"))).toMatchObject({
+    const condition = { username: 'kaho', host: null };
+
+    expect(await resolveEntity(await createNote(condition, "Everybody let's go!"))).toMatchObject({
       inReplyTo: null,
       content: "Everybody let's go!",
     });
-    expect(await resolveEntity(await createNote('kaho', null, "Everybody let's go!"))).toMatchObject({
+    expect(await resolveEntity(await createNote(condition, "Everybody let's go!"))).toMatchObject({
       inReplyTo: null,
       content: "Everybody let's go!",
     });
