@@ -25,6 +25,9 @@ export class Account {
   @Column('varchar', { length: 512, nullable: true })
   public inbox: string | null;
 
+  @Column('varchar', { length: 2048, nullable: true })
+  public publicKey: string | null;
+
   constructor(
     id: string,
     username: string,
@@ -32,6 +35,7 @@ export class Account {
     name: string,
     uri: string | null,
     inbox: string | null,
+    publicKey: string | null,
   ) {
     this.id = id;
     this.username = username;
@@ -39,5 +43,6 @@ export class Account {
     this.name = name;
     this.uri = uri;
     this.inbox = inbox;
+    this.publicKey = publicKey;
   }
 }

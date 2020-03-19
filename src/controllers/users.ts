@@ -45,7 +45,7 @@ export async function signUp(username: string, plainPassword: string, name: stri
       });
     });
 
-    const account = new Account(generateId(), username, null, name, null, null);
+    const account = new Account(generateId(), username, null, name, null, null, null);
     const user = new User(username, encryptedPassword, account, privateKey, publicKey);
     await transaction.insert(Account, account);
     await transaction.insert(User, user);

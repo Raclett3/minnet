@@ -19,6 +19,7 @@ export async function createRemoteAccount(
   name: string,
   uri: string,
   inbox: string,
+  publicKey: string,
 ): Promise<Account> {
   if (!validateUsername(username)) {
     throw new ControllerError('The username is invalid');
@@ -38,7 +39,7 @@ export async function createRemoteAccount(
       throw new ControllerError('The username and host already exists');
     }
 
-    const account = new Account(generateId(), username, host, name, uri, inbox);
+    const account = new Account(generateId(), username, host, name, uri, inbox, publicKey);
     await transaction.insert(Account, account);
     return account;
   });
@@ -55,7 +56,7 @@ export async function createLocalAccount(username: string, name: string): Promis
       throw new ControllerError('The username already exists');
     }
 
-    const account = new Account(generateId(), username, null, name, null, null);
+    const account = new Account(generateId(), username, null, name, null, null, null);
     await transaction.insert(Account, account);
     return account;
   });

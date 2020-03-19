@@ -30,6 +30,7 @@ describe('Usersコントローラー', () => {
         name: 'Kaho',
         uri: null,
         inbox: null,
+        publicKey: null,
       },
     };
 
@@ -41,6 +42,7 @@ describe('Usersコントローラー', () => {
         name: 'Natsuha',
         uri: null,
         inbox: null,
+        publicKey: null,
       },
     };
 
@@ -69,6 +71,7 @@ describe('Accountsコントローラー', () => {
       name: 'Asahi',
       uri: null,
       inbox: null,
+      publicKey: null,
     });
     expect(await Accounts.createLocalAccount('Fuyuko', 'Fuyuko')).toMatchObject({
       username: 'Fuyuko',
@@ -76,6 +79,7 @@ describe('Accountsコントローラー', () => {
       name: 'Fuyuko',
       uri: null,
       inbox: null,
+      publicKey: null,
     });
     expect(await Accounts.createLocalAccount('asahi', 'asahi')).toMatchObject({
       username: 'asahi',
@@ -83,6 +87,7 @@ describe('Accountsコントローラー', () => {
       name: 'asahi',
       uri: null,
       inbox: null,
+      publicKey: null,
     });
     await expect(Accounts.createLocalAccount('Asahi', 'Asahi')).rejects.toThrowError();
     expect(await repository.findOne({ username: 'asahi', host: null })).toMatchObject({
@@ -91,6 +96,7 @@ describe('Accountsコントローラー', () => {
       name: 'asahi',
       uri: null,
       inbox: null,
+      publicKey: null,
     });
   });
 
@@ -105,6 +111,7 @@ describe('Accountsコントローラー', () => {
         'Asahi',
         'https://example.com/Asahi',
         'https://example.com/inbox',
+        'publicKey',
       ),
     ).toMatchObject({
       username: 'Asahi',
@@ -112,6 +119,7 @@ describe('Accountsコントローラー', () => {
       name: 'Asahi',
       uri: 'https://example.com/Asahi',
       inbox: 'https://example.com/inbox',
+      publicKey: 'publicKey',
     });
     expect(
       await Accounts.createRemoteAccount(
@@ -120,6 +128,7 @@ describe('Accountsコントローラー', () => {
         'Fuyuko',
         'https://example.com/Fuyuko',
         'https://example.com/inbox',
+        'publicKey',
       ),
     ).toMatchObject({
       username: 'Fuyuko',
@@ -127,6 +136,7 @@ describe('Accountsコントローラー', () => {
       name: 'Fuyuko',
       uri: 'https://example.com/Fuyuko',
       inbox: 'https://example.com/inbox',
+      publicKey: 'publicKey',
     });
     expect(
       await Accounts.createRemoteAccount(
@@ -135,6 +145,7 @@ describe('Accountsコントローラー', () => {
         'Asahi',
         'https://example.com/asahi',
         'https://example.com/inbox',
+        'publicKey',
       ),
     ).toMatchObject({
       username: 'asahi',
@@ -142,6 +153,7 @@ describe('Accountsコントローラー', () => {
       name: 'Asahi',
       uri: 'https://example.com/asahi',
       inbox: 'https://example.com/inbox',
+      publicKey: 'publicKey',
     });
     await expect(
       Accounts.createRemoteAccount(
@@ -150,6 +162,7 @@ describe('Accountsコントローラー', () => {
         'Asahi',
         'https://example.com/asahi',
         'https://example.com/inbox',
+        'publicKey',
       ),
     ).rejects.toThrowError();
     expect(await repository.findOne({ username: 'Fuyuko', host: 'example.com' })).toMatchObject({
@@ -158,6 +171,7 @@ describe('Accountsコントローラー', () => {
       name: 'Fuyuko',
       uri: 'https://example.com/Fuyuko',
       inbox: 'https://example.com/inbox',
+      publicKey: 'publicKey',
     });
   });
 });
@@ -191,6 +205,7 @@ describe('Followコントローラー', () => {
         name,
         `https://example.com/${name}`,
         'https://example.com/inbox',
+        'publicKey',
       );
 
       accounts[name] = account;
