@@ -194,11 +194,11 @@ describe('Notesコントローラー', () => {
 
     const condition = { username: 'kaho', host: null };
 
-    expect(await resolveEntity(await createNote(condition, "Everybody let's go!"))).toMatchObject({
+    expect(await resolveEntity(await createNote(condition, { content: "Everybody let's go!" }))).toMatchObject({
       inReplyTo: null,
       content: "Everybody let's go!",
     });
-    expect(await resolveEntity(await createNote(condition, "Everybody let's go!"))).toMatchObject({
+    expect(await resolveEntity(await createNote(condition, { content: "Everybody let's go!" }))).toMatchObject({
       inReplyTo: null,
       content: "Everybody let's go!",
     });

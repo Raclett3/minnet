@@ -5,7 +5,13 @@ import { Note } from '../entities/note';
 import { generateId } from '../helpers/generate-id';
 import { ControllerError } from './error';
 
-export async function createNote(accountCondition: FindConditions<Account>, content: string, inReplyToId?: string) {
+type Option = {
+  createdAt?: Date;
+  inReplyToId?: string;
+  content: string;
+};
+
+export async function createNote(accountCondition: FindConditions<Account>, option: Option) {
   return await getConnection().transaction<Note>(async transaction => {
     const postedBy = await transaction.findOne(Account, accountCondition);
     if (!postedBy) {
@@ -13,15 +19,16 @@ export async function createNote(accountCondition: FindConditions<Account>, cont
     }
 
     let inReplyTo: Note | null = null;
-    if (inReplyToId) {
-      const note = await transaction.findOne(Note, { id: inReplyToId });
+    if (option.inReplyToId) {
+      const note = await transaction.findOne(Note, { id: option.inReplyToId });
       if (!note) {
         throw new ControllerError("The note you're replying to does not exist");
       }
       inReplyTo = note;
     }
 
-    const note = new Note(generateId(), new Date(), inReplyTo, content, postedBy, null);
+    const date = option.createdAt || new Date();
+    const note = new Note(generateId(), date, inReplyTo, option.content, postedBy, null);
     await transaction.insert(Note, note);
     return note;
   });
