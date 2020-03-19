@@ -18,6 +18,17 @@ beforeAll(async () => {
   await initPostgres();
 });
 
+async function resolveEntity(entity: any) {
+  for (const key of Object.keys(entity)) {
+    if (entity[key] instanceof Promise) {
+      entity[key] = await entity[key];
+    } else if (entity[key] && typeof entity[key] === 'object') {
+      resolveEntity(entity[key]);
+    }
+  }
+  return entity;
+}
+
 describe('Usersコントローラー', () => {
   test('サインアップ', async () => {
     const repository = getRepository(User);
@@ -181,11 +192,11 @@ describe('Notesコントローラー', () => {
     const repository = getRepository(Note);
     expect.assertions(3);
 
-    expect(await createNote('kaho', null, "Everybody let's go!")).toMatchObject({
+    expect(await resolveEntity(await createNote('kaho', null, "Everybody let's go!"))).toMatchObject({
       inReplyTo: null,
       content: "Everybody let's go!",
     });
-    expect(await createNote('kaho', null, "Everybody let's go!")).toMatchObject({
+    expect(await resolveEntity(await createNote('kaho', null, "Everybody let's go!"))).toMatchObject({
       inReplyTo: null,
       content: "Everybody let's go!",
     });
