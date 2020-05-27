@@ -3,9 +3,8 @@ import { URL } from 'url';
 
 import { Account } from '../entities/account';
 import { generateId } from '../helpers/generate-id';
+import { validateRemoteUsername, validateUsername } from '../helpers/validators';
 import { ControllerError } from './error';
-
-const validateUsername = (username: string) => /^[a-zA-Z]{1,32}$/.test(username);
 
 function validateURI(uri: string, host: string) {
   const validator = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])$/;
@@ -21,7 +20,7 @@ export async function createRemoteAccount(
   inbox: string,
   publicKey: string,
 ): Promise<Account> {
-  if (!validateUsername(username)) {
+  if (!validateRemoteUsername(username)) {
     throw new ControllerError('The username is invalid');
   }
 
