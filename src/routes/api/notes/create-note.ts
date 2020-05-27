@@ -2,9 +2,8 @@ import Koa from 'koa';
 import { getConnection } from 'typeorm';
 
 import { configCache } from '../../../config';
-import { Account } from '../../../entities/account';
-import { Note } from '../../../entities/note';
-import { generateId } from '../../../helpers/generate-id';
+import { createNote } from '../../../controllers/notes';
+import { User } from '../../../entities/user';
 import { verifyJWT } from '../../../helpers/jwt-async';
 
 export default async (ctx: Koa.Context) => {
@@ -30,14 +29,18 @@ export default async (ctx: Koa.Context) => {
   }
 
   const entityManager = getConnection().createEntityManager();
-  const account = await entityManager.findOne(Account, { id: accountId });
-  if (!account) {
+  const user = await entityManager.findOne(User, { account: { id: accountId } });
+  if (!user) {
     ctx.status = 401;
     return;
   }
 
-  const note = new Note(generateId(), new Date(), null, text, account, null);
-  entityManager.save(note);
+  await createNote(
+    { id: accountId },
+    {
+      content: text,
+    },
+  );
 
   ctx.status = 204;
 };
