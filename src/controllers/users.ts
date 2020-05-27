@@ -13,8 +13,10 @@ export async function signUp(username: string, plainPassword: string, name: stri
     throw new ControllerError('The username is invalid');
   }
 
+  const lowercase = username.toLowerCase();
+
   return await getConnection().transaction<User>(async transaction => {
-    const exist = await transaction.findOne(Account, { username: username });
+    const exist = await transaction.findOne(Account, { username: lowercase });
     if (exist) {
       throw new ControllerError('The username already exists');
     }
@@ -45,8 +47,8 @@ export async function signUp(username: string, plainPassword: string, name: stri
       });
     });
 
-    const account = new Account(generateId(), username, null, name, null, null, null);
-    const user = new User(username, encryptedPassword, account, privateKey, publicKey);
+    const account = new Account(generateId(), lowercase, null, name, null, null, null);
+    const user = new User(lowercase, encryptedPassword, account, privateKey, publicKey);
     await transaction.insert(Account, account);
     await transaction.insert(User, user);
 
@@ -55,8 +57,10 @@ export async function signUp(username: string, plainPassword: string, name: stri
 }
 
 export async function signIn(username: string, plainPassword: string): Promise<string | null> {
+  const lowercase = username.toLowerCase();
+
   return await getConnection().transaction(async transaction => {
-    const user = await transaction.findOne(User, { username: username });
+    const user = await transaction.findOne(User, { username: lowercase });
     if (!user) {
       return null;
     }
