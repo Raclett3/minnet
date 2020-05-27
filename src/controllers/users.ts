@@ -32,7 +32,7 @@ export async function signUp(username: string, plainPassword: string, name: stri
     });
 
     const [privateKey, publicKey] = await new Promise<[string, string]>((resolve, reject) => {
-      generateKeyPair('rsa', { modulusLength: 2048 }, (err, privateKey, publicKey) => {
+      generateKeyPair('rsa', { modulusLength: 2048 }, (err, publicKey, privateKey) => {
         if (err) {
           reject(err);
           return;
