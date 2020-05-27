@@ -3,12 +3,16 @@ import { createHash } from 'crypto';
 import RSA from 'node-rsa';
 import { URL } from 'url';
 
-import { readFile } from '../helpers/async-fs';
+import { configCache } from '../config';
 
-export async function deliver(keyId: string, target: string, document: {}): Promise<boolean> {
+export async function deliver(keyOwnerId: string, privateKey: Buffer, target: string, document: {}): Promise<boolean> {
+  if (!configCache) {
+    return false;
+  }
+
   const url = new URL(target);
   const date = new Date();
-  const rsa = new RSA(Buffer.from(await readFile(process.cwd() + '/private.pem')));
+  const rsa = new RSA(privateKey);
 
   const dateUTC = date.toUTCString();
   const digest = createHash('sha256')
@@ -23,7 +27,7 @@ export async function deliver(keyId: string, target: string, document: {}): Prom
         Host: url.host,
         Date: dateUTC,
         Digest: `SHA-256=${digest}`,
-        Signature: `keyId="${keyId}",headers="date digest",signature="${signature}",algorithm="rsa-sha256"`,
+        Signature: `keyId="https://${configCache.host}/users/${keyOwnerId}#main-key",headers="date digest",signature="${signature}",algorithm="rsa-sha256"`,
       },
     });
     console.log(res);
