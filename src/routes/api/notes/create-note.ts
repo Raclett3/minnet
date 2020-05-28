@@ -10,6 +10,7 @@ import { verifyJWT } from '../../../helpers/jwt-async';
 import { renderURI } from '../../../helpers/render-uri';
 import { resolveOrNull } from '../../../helpers/suppressors';
 import { deliver } from '../../../remote/deliver';
+import { resolveNote } from '../../../remote/resolver';
 
 export default async (ctx: Koa.Context) => {
   if (!configCache) {
@@ -55,11 +56,15 @@ export default async (ctx: Koa.Context) => {
   const uri = renderURI('users', user.username);
   const activity = appendContext(renderCreate(uri, renderNote(note.id, note.createdAt, uri, note.content, inReplyTo)));
 
+  const inboxes = await followerInboxes(user.account.id);
+
   if (typeof inReplyTo === 'string') {
-    await deliver(user.username, Buffer.from(user.privateKey), inReplyTo, activity);
+    const noteToReply = await resolveNote(inReplyTo);
+    if (noteToReply.postedBy.inbox) {
+      inboxes.add(noteToReply.postedBy.inbox);
+    }
   }
 
-  const inboxes = await followerInboxes(user.account.id);
   for (const inbox of inboxes) {
     await resolveOrNull(deliver(user.username, Buffer.from(user.privateKey), inbox, activity));
   }
