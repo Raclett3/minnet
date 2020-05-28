@@ -1,4 +1,5 @@
 import { createNote } from '../../../controllers/notes';
+import { validateNote } from '../../../helpers/validators';
 import { resolveAccount } from '../../resolver';
 import { Activity } from '../types';
 
@@ -21,23 +22,11 @@ export default async function create(activity: Activity): Promise<boolean> {
 }
 
 async function createPost(activity: Activity, actorUri: string | undefined): Promise<boolean> {
-  const activityType = activity.type;
-  const acceptable = ['Article', 'Audio', 'Document', 'Image', 'Note', 'Page', 'Question', 'Video'];
-
-  if (typeof activityType !== 'string' || !acceptable.includes(activityType)) {
+  if (!validateNote(activity)) {
     return false;
   }
 
-  const { id, published, attributedTo, content } = activity;
-
-  if (
-    typeof id !== 'string' ||
-    typeof published === 'object' ||
-    typeof attributedTo === 'object' ||
-    typeof content !== 'string'
-  ) {
-    return false;
-  }
+  const { id: uri, published, attributedTo, content } = activity as { [key: string]: string };
 
   const date = published ? new Date(published) : new Date();
   const actor = actorUri || attributedTo;
@@ -48,7 +37,7 @@ async function createPost(activity: Activity, actorUri: string | undefined): Pro
 
   const resolved = await resolveAccount(actor);
 
-  await createNote({ uri: resolved.uri }, { content: content, createdAt: date });
+  await createNote({ uri: resolved.uri }, { content: content, createdAt: date, uri: uri });
 
   return true;
 }
