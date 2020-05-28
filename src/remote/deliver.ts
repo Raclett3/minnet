@@ -29,7 +29,7 @@ export async function deliver(
 
   try {
     const uri = renderURI('keypair', keyOwnerName);
-    const res = await axios.post(`${url.protocol}//${url.host}/inbox`, document, {
+    const res = await axios.post(target, document, {
       headers: {
         Host: url.host,
         Date: dateUTC,
