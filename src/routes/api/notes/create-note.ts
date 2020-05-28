@@ -4,7 +4,7 @@ import { getConnection } from 'typeorm';
 import { configCache } from '../../../config';
 import { createNote } from '../../../controllers/notes';
 import { User } from '../../../entities/user';
-import { renderCreate, renderNote } from '../../../helpers/activitypub/renderer';
+import { appendContext, renderCreate, renderNote } from '../../../helpers/activitypub/renderer';
 import { verifyJWT } from '../../../helpers/jwt-async';
 import { deliver } from '../../../remote/deliver';
 
@@ -51,7 +51,9 @@ export default async (ctx: Koa.Context) => {
 
   if (typeof inReplyTo === 'string') {
     const uri = `https://${configCache.host}/users/${user.username}`;
-    const activity = renderCreate(uri, renderNote(note.id, note.createdAt, uri, note.content, inReplyTo));
+    const activity = appendContext(
+      renderCreate(uri, renderNote(note.id, note.createdAt, uri, note.content, inReplyTo)),
+    );
     await deliver(user.username, Buffer.from(user.privateKey), inReplyTo, activity);
   }
 
