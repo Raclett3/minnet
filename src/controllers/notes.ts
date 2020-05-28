@@ -8,6 +8,7 @@ import { ControllerError } from './error';
 type Option = {
   createdAt?: Date;
   inReplyToId?: string;
+  uri?: string;
   content: string;
 };
 
@@ -28,7 +29,7 @@ export async function createNote(accountCondition: FindConditions<Account>, opti
     }
 
     const date = option.createdAt || new Date();
-    const note = new Note(generateId(), date, inReplyTo, option.content, postedBy, null);
+    const note = new Note(generateId(), date, inReplyTo, option.content, postedBy, option.uri || null);
     await transaction.insert(Note, note);
     return note;
   });
