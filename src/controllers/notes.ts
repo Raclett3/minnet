@@ -3,16 +3,17 @@ import { FindConditions, getConnection } from 'typeorm';
 import { Account } from '../entities/account';
 import { Note } from '../entities/note';
 import { generateId } from '../helpers/generate-id';
+import { resolveNote } from '../remote/resolver';
 import { ControllerError } from './error';
 
 type Option = {
   createdAt?: Date;
-  inReplyToId?: string;
+  inReplyToUri?: string;
   uri?: string;
   content: string;
 };
 
-export async function createNote(accountCondition: FindConditions<Account>, option: Option) {
+export async function createNote(accountCondition: FindConditions<Account>, option: Option): Promise<Note> {
   return await getConnection().transaction<Note>(async transaction => {
     const postedBy = await transaction.findOne(Account, accountCondition);
     if (!postedBy) {
@@ -20,8 +21,8 @@ export async function createNote(accountCondition: FindConditions<Account>, opti
     }
 
     let inReplyTo: Note | null = null;
-    if (option.inReplyToId) {
-      const note = await transaction.findOne(Note, { id: option.inReplyToId });
+    if (option.inReplyToUri) {
+      const note = await resolveNote(option.inReplyToUri);
       if (!note) {
         throw new ControllerError("The note you're replying to does not exist");
       }
