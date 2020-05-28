@@ -2,6 +2,7 @@ import axios from 'axios';
 import { getRepository } from 'typeorm';
 import { URL } from 'url';
 
+import { configCache } from '../config';
 import { createRemoteAccount } from '../controllers/accounts';
 import { createNote } from '../controllers/notes';
 import { Account } from '../entities/account';
@@ -17,7 +18,21 @@ async function resolve(uri: string) {
 }
 
 export async function resolveAccount(uri: string) {
+  if (!configCache) {
+    throw Error();
+  }
+
   const repository = getRepository(Account);
+
+  if (new URL(uri).host === configCache.host) {
+    const username = uri.split('/').slice(-1)[0];
+    const note = await repository.findOne({ username: username });
+    if (!note) {
+      throw Error();
+    }
+
+    return note;
+  }
 
   const account = await repository.findOne({ uri: uri });
 
@@ -59,8 +74,22 @@ export async function resolveAccount(uri: string) {
   return created;
 }
 
-export async function resolveNote(uri: string) {
+export async function resolveNote(uri: string): Promise<Note> {
+  if (!configCache) {
+    throw Error();
+  }
+
   const repository = getRepository(Note);
+
+  if (new URL(uri).host === configCache.host) {
+    const id = uri.split('/').slice(-1)[0];
+    const note = await repository.findOne({ id: id });
+    if (!note) {
+      throw Error();
+    }
+
+    return note;
+  }
 
   const note = await repository.findOne({ uri: uri });
 
@@ -81,6 +110,6 @@ export async function resolveNote(uri: string) {
 
   return await createNote(
     { uri: account.uri || undefined },
-    { content: content, createdAt: new Date(published), uri: uri, inReplyToId: inReplyTo },
+    { content: content, createdAt: new Date(published), uri: uri, inReplyToUri: inReplyTo },
   );
 }
