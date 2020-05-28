@@ -3,8 +3,10 @@ import { getRepository } from 'typeorm';
 import { URL } from 'url';
 
 import { createRemoteAccount } from '../controllers/accounts';
+import { createNote } from '../controllers/notes';
 import { Account } from '../entities/account';
-import { validateRemoteUsername } from '../helpers/validators';
+import { Note } from '../entities/note';
+import { validateNote, validateRemoteUsername } from '../helpers/validators';
 
 async function resolve(uri: string) {
   const result = await axios.get(uri, {
@@ -55,4 +57,30 @@ export async function resolveAccount(uri: string) {
   );
 
   return created;
+}
+
+export async function resolveNote(uri: string) {
+  const repository = getRepository(Note);
+
+  const note = await repository.findOne({ uri: uri });
+
+  if (note) {
+    return note;
+  }
+
+  const resolved = await resolve(uri);
+
+  const host = new URL(uri).host;
+
+  if (!validateNote(resolved, host)) {
+    throw new Error();
+  }
+
+  const { content, published, attributedTo, inReplyTo } = resolved;
+  const account = await resolveAccount(attributedTo);
+
+  return await createNote(
+    { uri: account.uri || undefined },
+    { content: content, createdAt: new Date(published), uri: uri, inReplyToId: inReplyTo },
+  );
 }
