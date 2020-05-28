@@ -2,6 +2,7 @@ import Router from '@koa/router';
 import Koa from 'koa';
 
 import { configCache } from '../config';
+import { renderURI } from '../helpers/render-uri';
 
 const router = new Router();
 
@@ -32,7 +33,7 @@ router.get('/.well-known/webfinger', ctx => {
       {
         rel: 'self',
         type: 'application/activity+json',
-        href: `https://${configCache.host}/users/${username}`,
+        href: renderURI('users', username),
       },
     ],
   };

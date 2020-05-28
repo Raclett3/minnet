@@ -6,6 +6,7 @@ import { configCache } from '../config';
 import { Note } from '../entities/note';
 import { User } from '../entities/user';
 import { appendContext, renderLocalPerson, renderNote } from '../helpers/activitypub/renderer';
+import { renderURI } from '../helpers/render-uri';
 
 const router = new Router();
 
@@ -63,7 +64,7 @@ router.get('/notes/:note', async ctx => {
     renderNote(
       note.id,
       note.createdAt,
-      note.uri || `https://${configCache.host}/users/${note.postedBy.username}`,
+      note.uri || renderURI('users', note.postedBy.username),
       note.content,
       inReplyTo && inReplyTo.id,
     ),

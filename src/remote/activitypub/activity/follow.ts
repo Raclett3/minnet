@@ -6,6 +6,7 @@ import { followAccount } from '../../../controllers/follows';
 import { Account } from '../../../entities/account';
 import { User } from '../../../entities/user';
 import { appendContext, renderAccept } from '../../../helpers/activitypub/renderer';
+import { renderURI } from '../../../helpers/render-uri';
 import { resolveLocalUsernameFromURI } from '../../../helpers/resolve-uri';
 import { deliver } from '../../deliver';
 import { Activity } from '../types';
@@ -38,7 +39,7 @@ export default async function follow(activity: Activity): Promise<boolean> {
     return false;
   }
 
-  const uri = `https://${configCache.host}/users/${followee.username}`;
+  const uri = renderURI('users', followee.username);
   const accept = appendContext(renderAccept(uri, activity));
   await deliver(followee.account.name, Buffer.from(followee.privateKey), follower.inbox || '', accept);
   await followAccount(follower, followee.account);

@@ -7,6 +7,7 @@ import { createNote } from '../../../controllers/notes';
 import { User } from '../../../entities/user';
 import { appendContext, renderCreate, renderNote } from '../../../helpers/activitypub/renderer';
 import { verifyJWT } from '../../../helpers/jwt-async';
+import { renderURI } from '../../../helpers/render-uri';
 import { resolveOrNull } from '../../../helpers/suppressors';
 import { deliver } from '../../../remote/deliver';
 
@@ -51,7 +52,7 @@ export default async (ctx: Koa.Context) => {
     },
   );
 
-  const uri = `https://${configCache.host}/users/${user.username}`;
+  const uri = renderURI('users', user.username);
   const activity = appendContext(renderCreate(uri, renderNote(note.id, note.createdAt, uri, note.content, inReplyTo)));
 
   if (typeof inReplyTo === 'string') {
