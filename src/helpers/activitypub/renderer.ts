@@ -57,3 +57,12 @@ export function renderCreate(actor: string, object: {}) {
     object: object,
   };
 }
+
+export function renderAccept(actor: string, object: {}) {
+  return {
+    type: 'Accept',
+    actor: actor,
+
+    object: object,
+  };
+}
