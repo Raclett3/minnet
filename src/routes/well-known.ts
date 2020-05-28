@@ -10,7 +10,21 @@ router.get('/.well-known/webfinger', ctx => {
     throw Error('Configがロードされていません。');
   }
 
-  const username = 'asahi';
+  const resource: string = ctx.query.resource;
+  if (typeof resource !== 'string') {
+    ctx.response.status = 400;
+  }
+  const acct = resource
+    .toLowerCase()
+    .split(/:|\//)
+    .slice(-1)[0];
+
+  const [username, host] = acct.split('@');
+
+  if (host && host !== configCache.host) {
+    ctx.response.status = 404;
+    return;
+  }
 
   ctx.body = {
     subject: `acct:${username}@${configCache.host}`,
