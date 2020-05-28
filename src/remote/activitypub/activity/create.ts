@@ -26,7 +26,7 @@ async function createPost(activity: Activity, actorUri: string | undefined): Pro
     return false;
   }
 
-  const { id: uri, published, attributedTo, content } = activity as { [key: string]: string };
+  const { id: uri, published, attributedTo, content, inReplyTo } = activity as { [key: string]: string };
 
   const date = published ? new Date(published) : new Date();
   const actor = actorUri || attributedTo;
@@ -37,7 +37,10 @@ async function createPost(activity: Activity, actorUri: string | undefined): Pro
 
   const resolved = await resolveAccount(actor);
 
-  await createNote({ uri: resolved.uri }, { content: content, createdAt: date, uri: uri });
+  await createNote(
+    { uri: resolved.uri },
+    { content: content, createdAt: date, uri: uri, inReplyToUri: inReplyTo || '' },
+  );
 
   return true;
 }
