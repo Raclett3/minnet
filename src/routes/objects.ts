@@ -46,7 +46,7 @@ router.get('/notes/:note', async ctx => {
     renderNote(
       note.id,
       note.createdAt,
-      note.uri || `https://${configCache.host}/users/${note.postedBy.id}`,
+      note.uri || `https://${configCache.host}/users/${note.postedBy.username}`,
       note.content,
       inReplyTo && inReplyTo.id,
     ),

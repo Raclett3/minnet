@@ -5,7 +5,12 @@ import { URL } from 'url';
 
 import { configCache } from '../config';
 
-export async function deliver(keyOwnerId: string, privateKey: Buffer, target: string, document: {}): Promise<boolean> {
+export async function deliver(
+  keyOwnerName: string,
+  privateKey: Buffer,
+  target: string,
+  document: {},
+): Promise<boolean> {
   if (!configCache) {
     return false;
   }
@@ -27,7 +32,7 @@ export async function deliver(keyOwnerId: string, privateKey: Buffer, target: st
         Host: url.host,
         Date: dateUTC,
         Digest: `SHA-256=${digest}`,
-        Signature: `keyId="https://${configCache.host}/users/${keyOwnerId}#main-key",headers="date digest",signature="${signature}",algorithm="rsa-sha256"`,
+        Signature: `keyId="https://${configCache.host}/users/${keyOwnerName}#main-key",headers="date digest",signature="${signature}",algorithm="rsa-sha256"`,
       },
     });
     console.log(res);
