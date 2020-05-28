@@ -40,6 +40,23 @@ router.get('/.well-known/webfinger', ctx => {
   ctx.status = 200;
 });
 
+router.get('/.well-known/nodeinfo', ctx => {
+  if (!configCache) {
+    throw Error('Configがロードされていません。');
+  }
+
+  ctx.body = {
+    links: [
+      {
+        rel: 'http://nodeinfo.diaspora.software/ns/schema/2.0',
+        href: `https://${configCache.host}/nodeinfo/2.0`,
+      },
+    ],
+  };
+
+  ctx.status = 200;
+});
+
 const app = new Koa();
 app.use(router.routes());
 app.use(router.allowedMethods());
