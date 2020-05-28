@@ -2,10 +2,12 @@ import Koa from 'koa';
 import { getConnection } from 'typeorm';
 
 import { configCache } from '../../../config';
+import { followerInboxes } from '../../../controllers/follows';
 import { createNote } from '../../../controllers/notes';
 import { User } from '../../../entities/user';
 import { appendContext, renderCreate, renderNote } from '../../../helpers/activitypub/renderer';
 import { verifyJWT } from '../../../helpers/jwt-async';
+import { resolveOrNull } from '../../../helpers/suppressors';
 import { deliver } from '../../../remote/deliver';
 
 export default async (ctx: Koa.Context) => {
@@ -49,12 +51,16 @@ export default async (ctx: Koa.Context) => {
     },
   );
 
+  const uri = `https://${configCache.host}/users/${user.username}`;
+  const activity = appendContext(renderCreate(uri, renderNote(note.id, note.createdAt, uri, note.content, inReplyTo)));
+
   if (typeof inReplyTo === 'string') {
-    const uri = `https://${configCache.host}/users/${user.username}`;
-    const activity = appendContext(
-      renderCreate(uri, renderNote(note.id, note.createdAt, uri, note.content, inReplyTo)),
-    );
     await deliver(user.username, Buffer.from(user.privateKey), inReplyTo, activity);
+  }
+
+  const inboxes = await followerInboxes(user.account.id);
+  for (const inbox of inboxes) {
+    await resolveOrNull(deliver(user.username, Buffer.from(user.privateKey), inbox, activity));
   }
 
   ctx.status = 204;
