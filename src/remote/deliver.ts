@@ -32,7 +32,7 @@ export async function deliver(
         Host: url.host,
         Date: dateUTC,
         Digest: `SHA-256=${digest}`,
-        Signature: `keyId="https://${configCache.host}/users/${keyOwnerName}#main-key",headers="date digest",signature="${signature}",algorithm="rsa-sha256"`,
+        Signature: `keyId="https://${configCache.host}/keypair/${keyOwnerName}",headers="date digest",signature="${signature}",algorithm="rsa-sha256"`,
       },
     });
     console.log(res);

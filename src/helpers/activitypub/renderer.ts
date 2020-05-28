@@ -21,7 +21,7 @@ export function renderLocalPerson(username: string, name: string, publicKeyPem: 
     inbox: `https://${configCache.host}/inbox`,
 
     publicKey: {
-      id: `https://${configCache.host}/users/${username}#main-key`,
+      id: `https://${configCache.host}/keypair/${username}`,
       owner: `https://${configCache.host}/users/${username}`,
       publicKeyPem: publicKeyPem,
     },

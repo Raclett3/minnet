@@ -26,6 +26,23 @@ router.get('/users/:user', async ctx => {
   ctx.body = appendContext(renderLocalPerson(user.username, user.account.name, user.publicKey));
 });
 
+router.get('/keypair/:user', async ctx => {
+  if (!configCache) {
+    ctx.status = 500;
+    return;
+  }
+
+  const user = await getRepository(User).findOne({ username: ctx.params.user });
+
+  if (!user) {
+    ctx.status = 404;
+    ctx.body = {};
+    return;
+  }
+
+  ctx.body = appendContext(renderLocalPerson(user.username, user.account.name, user.publicKey).publicKey);
+});
+
 router.get('/notes/:note', async ctx => {
   if (!configCache) {
     ctx.status = 500;
