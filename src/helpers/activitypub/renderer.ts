@@ -67,3 +67,11 @@ export function renderAccept(actor: string, object: {}) {
     object: object,
   };
 }
+
+export function renderFollow(actor: string, object: string) {
+  return {
+    type: 'Follow',
+    actor: actor,
+    object: object,
+  };
+}
