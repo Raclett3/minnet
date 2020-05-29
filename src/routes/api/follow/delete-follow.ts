@@ -41,11 +41,15 @@ export default async (ctx: Koa.Context) => {
 
   const resolved = await resolveAccount(target);
 
-  const actorURI = renderURI('users', user.username);
-  const targetInbox = resolved.inbox || `https://${configCache.host}/inbox`;
-  const activity = appendContext(renderUndo(actorURI, renderFollow(actorURI, target)));
-  await unfollowAccount(user.account, resolved);
-  await resolveOrNull(deliver(user.username, Buffer.from(user.privateKey), targetInbox, activity));
+  if (resolved.inbox) {
+    const actorURI = renderURI('users', user.username);
+    const activity = appendContext(renderUndo(actorURI, renderFollow(actorURI, target)));
+
+    await unfollowAccount(user.account, resolved);
+    await resolveOrNull(deliver(user.username, Buffer.from(user.privateKey), resolved.inbox, activity));
+  } else {
+    await unfollowAccount(user.account, resolved);
+  }
 
   ctx.status = 204;
 };
