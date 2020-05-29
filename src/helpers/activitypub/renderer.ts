@@ -75,3 +75,11 @@ export function renderFollow(actor: string, object: string) {
     object: object,
   };
 }
+
+export function renderUndo(actor: string, object: {}) {
+  return {
+    type: 'Undo',
+    actor: actor,
+    object: object,
+  };
+}
