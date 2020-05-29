@@ -51,6 +51,7 @@ export async function resolveAccount(uri: string) {
     !expectedTypes.includes(resolved.type) ||
     typeof resolved.inbox !== 'string' ||
     typeof resolved.id !== 'string' ||
+    typeof resolved.id !== uri ||
     new URL(resolved.id).host !== host ||
     typeof resolved.preferredUsername !== 'string' ||
     !validateRemoteUsername(resolved.preferredUsername) ||
@@ -101,7 +102,7 @@ export async function resolveNote(uri: string): Promise<Note> {
 
   const host = new URL(uri).host;
 
-  if (!validateNote(resolved, host)) {
+  if (!validateNote(resolved, host) || resolved.id !== uri) {
     throw new Error();
   }
 
