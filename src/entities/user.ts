@@ -14,7 +14,7 @@ export class User {
   @JoinColumn()
   public account: Account;
 
-  @Column('varchar', { length: 1024 })
+  @Column('varchar', { length: 2048 })
   public privateKey: string;
 
   @Column('varchar', { length: 2048 })

@@ -3,12 +3,22 @@ import { createHash } from 'crypto';
 import RSA from 'node-rsa';
 import { URL } from 'url';
 
-import { readFile } from '../helpers/async-fs';
+import { configCache } from '../config';
+import { renderURI } from '../helpers/render-uri';
 
-export async function deliver(keyId: string, target: string, document: {}): Promise<boolean> {
+export async function deliver(
+  keyOwnerName: string,
+  privateKey: Buffer,
+  target: string,
+  document: {},
+): Promise<boolean> {
+  if (!configCache) {
+    return false;
+  }
+
   const url = new URL(target);
   const date = new Date();
-  const rsa = new RSA(Buffer.from(await readFile(process.cwd() + '/private.pem')));
+  const rsa = new RSA(privateKey);
 
   const dateUTC = date.toUTCString();
   const digest = createHash('sha256')
@@ -18,12 +28,13 @@ export async function deliver(keyId: string, target: string, document: {}): Prom
   const signature = rsa.sign(signedString).toString('base64');
 
   try {
-    const res = await axios.post(`${url.protocol}//${url.host}/inbox`, document, {
+    const uri = renderURI('keypair', keyOwnerName);
+    const res = await axios.post(target, document, {
       headers: {
         Host: url.host,
         Date: dateUTC,
         Digest: `SHA-256=${digest}`,
-        Signature: `keyId="${keyId}",headers="date digest",signature="${signature}",algorithm="rsa-sha256"`,
+        Signature: `keyId="${uri}",headers="date digest",signature="${signature}",algorithm="rsa-sha256"`,
       },
     });
     console.log(res);

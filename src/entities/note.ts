@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 import { Account } from './account';
 
@@ -11,9 +11,9 @@ export class Note {
   @Column('timestamp with time zone')
   public createdAt: Date;
 
-  @OneToOne(() => Note, { eager: true })
+  @ManyToOne(() => Note)
   @JoinColumn()
-  public inReplyTo: Note | null;
+  public inReplyTo: Promise<Note | null> | Note | null;
 
   @Column('varchar', { length: 8192 })
   public content: string;
@@ -22,11 +22,23 @@ export class Note {
   @JoinColumn()
   public postedBy: Account;
 
-  constructor(id: string, createdAt: Date, inReplyTo: Note | null, content: string, postedBy: Account) {
+  @Index({ unique: true })
+  @Column('varchar', { length: 512, nullable: true })
+  public uri: string | null;
+
+  constructor(
+    id: string,
+    createdAt: Date,
+    inReplyTo: Note | null,
+    content: string,
+    postedBy: Account,
+    uri: string | null,
+  ) {
     this.id = id;
     this.createdAt = createdAt;
     this.inReplyTo = inReplyTo;
     this.content = content;
     this.postedBy = postedBy;
+    this.uri = uri;
   }
 }

@@ -12,3 +12,16 @@ export async function readFile(filename: string): Promise<string> {
     });
   });
 }
+
+export async function writeFile(filename: string, data: string): Promise<void> {
+  return await new Promise((resolve, reject) => {
+    fs.writeFile(filename, data, err => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve();
+    });
+  });
+}

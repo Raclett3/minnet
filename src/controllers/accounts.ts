@@ -3,9 +3,8 @@ import { URL } from 'url';
 
 import { Account } from '../entities/account';
 import { generateId } from '../helpers/generate-id';
+import { validateRemoteUsername, validateUsername } from '../helpers/validators';
 import { ControllerError } from './error';
-
-const validateUsername = (username: string) => /^[a-zA-Z]{1,32}$/.test(username);
 
 function validateURI(uri: string, host: string) {
   const validator = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])$/;
@@ -19,8 +18,9 @@ export async function createRemoteAccount(
   name: string,
   uri: string,
   inbox: string,
+  publicKey: string,
 ): Promise<Account> {
-  if (!validateUsername(username)) {
+  if (!validateRemoteUsername(username)) {
     throw new ControllerError('The username is invalid');
   }
 
@@ -38,7 +38,7 @@ export async function createRemoteAccount(
       throw new ControllerError('The username and host already exists');
     }
 
-    const account = new Account(generateId(), username, host, name, uri, inbox);
+    const account = new Account(generateId(), username, host, name, uri, inbox, publicKey);
     await transaction.insert(Account, account);
     return account;
   });
@@ -55,7 +55,7 @@ export async function createLocalAccount(username: string, name: string): Promis
       throw new ControllerError('The username already exists');
     }
 
-    const account = new Account(generateId(), username, null, name, null, null);
+    const account = new Account(generateId(), username, null, name, null, null, null);
     await transaction.insert(Account, account);
     return account;
   });

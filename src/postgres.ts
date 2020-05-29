@@ -1,6 +1,7 @@
 import { createConnection, getConnection } from 'typeorm';
 
 import { Account } from './entities/account';
+import { Follow } from './entities/follow';
 import { Note } from './entities/note';
 import { User } from './entities/user';
 
@@ -19,7 +20,7 @@ export function initPostgres() {
       synchronize: isTest,
       dropSchema: isTest,
       logging: false,
-      entities: [Account, User, Note],
+      entities: [Account, User, Note, Follow],
     });
   }
 }

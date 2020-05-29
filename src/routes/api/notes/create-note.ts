@@ -1,8 +1,16 @@
 import Koa from 'koa';
-import { URL } from 'url';
+import { getConnection } from 'typeorm';
 
 import { configCache } from '../../../config';
+import { followerInboxes } from '../../../controllers/follows';
+import { createNote } from '../../../controllers/notes';
+import { User } from '../../../entities/user';
+import { appendContext, renderCreate, renderNote } from '../../../helpers/activitypub/renderer';
+import { verifyJWT } from '../../../helpers/jwt-async';
+import { renderURI } from '../../../helpers/render-uri';
+import { resolveOrNull } from '../../../helpers/suppressors';
 import { deliver } from '../../../remote/deliver';
+import { resolveNote } from '../../../remote/resolver';
 
 export default async (ctx: Koa.Context) => {
   if (!configCache) {
@@ -10,45 +18,55 @@ export default async (ctx: Koa.Context) => {
     return;
   }
 
-  const inReplyTo = ctx.request.body.in_reply_to;
   const text = ctx.request.body.text;
   const token = ctx.request.body.token;
+  const inReplyTo = ctx.request.body.inReplyTo;
 
-  if (typeof inReplyTo !== 'string' || typeof text !== 'string' || typeof token !== 'string') {
+  if (
+    typeof text !== 'string' ||
+    typeof token !== 'string' ||
+    (inReplyTo !== undefined && typeof inReplyTo !== 'string')
+  ) {
     ctx.status = 400;
     return;
   }
 
-  if (token !== process.env.TOKEN) {
+  let accountId: string;
+  try {
+    accountId = await verifyJWT(token);
+  } catch (err) {
     ctx.status = 401;
     return;
   }
 
-  const url = new URL(inReplyTo);
-  const date = new Date();
-  const actor = `https://${configCache.host}/users/asahi`;
-  const id = Math.floor(Math.random() * 10000000);
+  const entityManager = getConnection().createEntityManager();
+  const user = await entityManager.findOne(User, { account: { id: accountId } });
+  if (!user) {
+    ctx.status = 401;
+    return;
+  }
 
-  const document = {
-    '@context': 'https://www.w3.org/ns/activitystreams',
-
-    id: `https://${configCache.host}/create/${id}`,
-    type: 'Create',
-    actor: actor,
-
-    object: {
-      id: `https://${configCache.host}/notes/${id}`,
-      type: 'Note',
-      published: date.toISOString(),
-      attributedTo: actor,
-      inReplyTo: inReplyTo,
+  const note = await createNote(
+    { id: accountId },
+    {
       content: text,
-      to: 'https://www.w3.org/ns/activitystreams#Public',
     },
-  };
+  );
 
-  if (!deliver(actor, `${url.protocol}//${url.host}/inbox`, document)) {
-    ctx.status = 500;
+  const uri = renderURI('users', user.username);
+  const activity = appendContext(renderCreate(uri, renderNote(note.id, note.createdAt, uri, note.content, inReplyTo)));
+
+  const inboxes = await followerInboxes(user.account.id);
+
+  if (typeof inReplyTo === 'string') {
+    const noteToReply = await resolveNote(inReplyTo);
+    if (noteToReply.postedBy.inbox) {
+      inboxes.add(noteToReply.postedBy.inbox);
+    }
+  }
+
+  for (const inbox of inboxes) {
+    await resolveOrNull(deliver(user.username, Buffer.from(user.privateKey), inbox, activity));
   }
 
   ctx.status = 204;

@@ -29,7 +29,7 @@ describe('各種ActivityPubオブジェクトの取得', () => {
 
     const connection = getConnection();
     const repository = connection.getRepository(User);
-    const mano = await repository.findOne({ username: 'Mano' });
+    const mano = await repository.findOne({ username: 'mano' });
     if (!mano) {
       throw new Error('Failed to find a user');
     }
