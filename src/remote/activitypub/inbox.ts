@@ -1,6 +1,7 @@
 import { ParsedSignature, verifySignature } from 'http-signature';
 
 import { resolveAccount } from '../resolver';
+import accept from './activity/accept';
 import create from './activity/create';
 import follow from './activity/follow';
 import undo from './activity/undo';
@@ -29,5 +30,5 @@ export async function inbox(activity: Activity, signature: ParsedSignature) {
     return;
   }
 
-  (await create(activity)) || (await follow(activity)) || (await undo(activity));
+  (await accept(activity)) || (await create(activity)) || (await follow(activity)) || (await undo(activity));
 }
