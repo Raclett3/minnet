@@ -1,4 +1,4 @@
-import { Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 import { Account } from './account';
 
@@ -16,9 +16,13 @@ export class Follow {
   @JoinColumn()
   public followee: Account;
 
-  constructor(id: string, follower: Account, followee: Account) {
+  @Column('boolean')
+  public accepted: boolean;
+
+  constructor(id: string, follower: Account, followee: Account, accepted: boolean) {
     this.id = id;
     this.follower = follower;
     this.followee = followee;
+    this.accepted = accepted;
   }
 }

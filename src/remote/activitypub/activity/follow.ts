@@ -42,7 +42,7 @@ export default async function follow(activity: Activity): Promise<boolean> {
   const uri = renderURI('users', followee.username);
   const accept = appendContext(renderAccept(uri, activity));
   await deliver(followee.account.name, Buffer.from(followee.privateKey), follower.inbox || '', accept);
-  await followAccount(follower, followee.account);
+  await followAccount(follower, followee.account, true);
 
   return true;
 }
