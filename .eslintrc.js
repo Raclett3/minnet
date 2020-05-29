@@ -9,6 +9,9 @@ module.exports = {
     'plugin:import/typescript',
     'prettier/@typescript-eslint',
     'plugin:prettier/recommended',
+    'plugin:vue/recommended',
+    'prettier/vue',
+    '@vue/typescript',
   ],
   plugins: ['simple-import-sort'],
   env: {
