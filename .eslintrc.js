@@ -30,6 +30,7 @@ module.exports = {
     'no-empty': ['error', { allowEmptyCatch: false }],
     'simple-import-sort/sort': 'error',
     'sort-imports': 'off',
+    'require-atomic-updates': 'off',
   },
   overrides: [
     {
