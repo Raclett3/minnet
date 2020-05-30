@@ -12,18 +12,16 @@ import wellKnown from './well-known';
 const router = new Router();
 const sendOptions = { root: process.cwd() + '/build/client/' };
 
-router.get('/', ctx => send(ctx, 'index.html', sendOptions));
 router.get('/app.js', ctx => send(ctx, 'app.js', sendOptions));
+router.get('*', ctx => send(ctx, 'index.html', sendOptions));
 
 const app = new Koa();
-app.use(router.routes());
-app.use(router.allowedMethods());
 app.use(mount(wellKnown));
 app.use(mount(api));
 app.use(mount(nodeinfo));
 app.use(mount(objects));
 app.use(mount(inbox));
-
-router.get('*', ctx => send(ctx, 'index.html', sendOptions));
+app.use(router.routes());
+app.use(router.allowedMethods());
 
 export default app;
