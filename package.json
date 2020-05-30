@@ -60,6 +60,7 @@
     "vue": "2.6.11",
     "vue-loader": "15.9.0",
     "vue-property-decorator": "8.4.0",
+    "vue-router": "3.3.2",
     "vue-template-compiler": "2.6.11",
     "webpack": "4.41.6",
     "webpack-cli": "3.3.11"
