@@ -24,4 +24,6 @@ app.use(mount(nodeinfo));
 app.use(mount(objects));
 app.use(mount(inbox));
 
+router.get('*', ctx => send(ctx, 'index.html', sendOptions));
+
 export default app;
