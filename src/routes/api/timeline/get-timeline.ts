@@ -10,7 +10,7 @@ export default async (ctx: Koa.Context) => {
     return;
   }
 
-  const local: boolean = ctx.query.text === 'true';
+  const local: boolean = ctx.query.local === 'true';
   const limit: number = ctx.query.token || 30;
   const olderThanId: string | null = ctx.query.olderThanId || null;
   const newerThanId: string | null = ctx.query.newerThanId || null;
