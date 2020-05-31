@@ -3,6 +3,7 @@ import Router from 'vue-router';
 
 import App from './App.vue';
 import './static/index.html';
+import './static/style.css';
 import Index from './views/Index.vue';
 import NotFound from './views/NotFound.vue';
 
