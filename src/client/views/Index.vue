@@ -1,18 +1,35 @@
 <template>
-  <div>Hello, {{ name }}</div>
+  <div class="timeline">
+    <note v-for="note in timeline" :key="note.id" :author="note.postedBy.name">{{ note.content }}</note>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-@Component
+import { APINote } from '../../routes/api/entities/note';
+import Note from '../components/Note.vue';
+import { api } from '../lib/request';
+
+@Component({ components: { Note } })
 export default class extends Vue {
-  public name = '';
-  mounted() {
-    const names = ['John', 'Bob', 'Alice'];
-    this.name = names[Math.floor(Math.random() * 3)];
+  public timeline: APINote[] = [];
+
+  public async getTimeline() {
+    this.timeline = await api('get', '/api/timeline', {});
+  }
+
+  public mounted() {
+    this.getTimeline();
   }
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.timeline {
+  background-color: #fff;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 768px;
+}
+</style>
