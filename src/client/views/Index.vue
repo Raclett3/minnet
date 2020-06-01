@@ -14,12 +14,19 @@ import { api } from '../lib/request';
 @Component({ components: { Note } })
 export default class extends Vue {
   public timeline: APINote[] = [];
+  private ws!: WebSocket;
 
   public async getTimeline() {
     this.timeline = await api('get', '/api/timeline', {});
   }
 
   public mounted() {
+    const host = new URL(location.href).host;
+    this.ws = new WebSocket(`wss://${host}/?channel=timeline`);
+    this.ws.onmessage = data => {
+      const note: APINote = JSON.parse(data.data);
+      this.timeline.unshift(note);
+    };
     this.getTimeline();
   }
 }
