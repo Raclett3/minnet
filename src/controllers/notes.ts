@@ -32,6 +32,27 @@ export async function createNote(accountCondition: FindConditions<Account>, opti
     const date = option.createdAt || new Date();
     const note = new Note(generateId(), date, inReplyTo, option.content, postedBy, option.uri || null);
     await transaction.insert(Note, note);
+
+    for (const key of Object.keys(timelineSubscribers)) {
+      timelineSubscribers[key].callback(note);
+    }
+
     return note;
   });
+}
+
+const timelineSubscribers: {
+  [key: string]: TimelineSubscriber;
+} = {};
+
+export class TimelineSubscriber {
+  private id: string = generateId();
+
+  constructor(public callback: (event: Note) => unknown) {
+    timelineSubscribers[this.id] = this;
+  }
+
+  remove() {
+    delete timelineSubscribers[this.id];
+  }
 }
