@@ -18,8 +18,8 @@ export default class extends Vue {
 .note {
   border-bottom: 1px solid #aaa;
   color: #111;
-  padding: 10px;
-  width: calc(100% - 20px);
+  padding: 20px;
+  width: calc(100% - 40px);
 }
 
 .author {
