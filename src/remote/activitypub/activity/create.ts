@@ -1,4 +1,5 @@
 import { createNote } from '../../../controllers/notes';
+import { parseHTML } from '../../../helpers/parse-html';
 import { validateNote } from '../../../helpers/validators';
 import { resolveAccount } from '../../resolver';
 import { Activity } from '../types';
@@ -39,7 +40,7 @@ async function createPost(activity: Activity, actorUri: string | undefined): Pro
 
   await createNote(
     { uri: resolved.uri },
-    { content: content, createdAt: date, uri: uri, inReplyToUri: inReplyTo || '' },
+    { content: parseHTML(content), createdAt: date, uri: uri, inReplyToUri: inReplyTo || '' },
   );
 
   return true;
