@@ -1,7 +1,9 @@
 <template>
   <div class="textarea">
     <p v-if="label" class="label">{{ label }}</p>
-    <p><textarea v-model="value" :type="type" @input="$emit('input', $event.target.value)" /></p>
+    <p>
+      <textarea :value="value" :type="type" @input="$emit('input', $event.target.value)" />
+    </p>
   </div>
 </template>
 
