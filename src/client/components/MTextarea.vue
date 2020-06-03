@@ -24,7 +24,9 @@ p {
 textarea {
   border: 1px solid #000;
   background-color: #fff;
-  width: calc(100% - 1px);
+  padding: 5px;
+  margin: 0;
+  width: calc(100% - 12px);
   resize: vertical;
 }
 
