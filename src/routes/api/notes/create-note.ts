@@ -54,7 +54,8 @@ export default async (ctx: Koa.Context) => {
   );
 
   const uri = renderURI('users', user.username);
-  const activity = appendContext(renderCreate(uri, renderNote(note.id, note.createdAt, uri, note.content, inReplyTo)));
+  const content = convertToHTML(note.content);
+  const activity = appendContext(renderCreate(uri, renderNote(note.id, note.createdAt, uri, content, inReplyTo)));
 
   const inboxes = await followerInboxes(user.account.id);
 
