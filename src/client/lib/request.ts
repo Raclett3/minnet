@@ -1,10 +1,9 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
-type Parameter = string | number | null | boolean;
-type ArrayOrSingle<T> = T | T[];
+type Parameter = string | number | boolean;
 
 type Parameters = {
-  [key: string]: ArrayOrSingle<Parameter | Parameters>;
+  [key: string]: Parameter;
 };
 
 export async function api(method: 'post' | 'get', url: string, params: Parameters) {
@@ -14,15 +13,15 @@ export async function api(method: 'post' | 'get', url: string, params: Parameter
 
   const result = await (() => {
     if (method === 'post') {
-      return axios.post(url, params, option);
+      option.headers = { 'content-type': 'application/x-www-form-urlencoded' };
+      const queryString = Object.keys(params)
+        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`, [])
+        .join('&');
+      return axios.post(url, queryString, option);
     } else {
       option.params = Object.keys(params).reduce((acc, key) => {
         const param = params[key];
-        if (typeof param !== 'object') {
-          acc[key] = param;
-        } else if (Array.isArray(param)) {
-          acc[key] = param.filter(x => typeof x !== 'object');
-        }
+        acc[key] = param.toString();
         return acc;
       }, {} as Parameters);
       return axios.get(url, option);
