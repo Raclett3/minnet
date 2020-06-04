@@ -6,6 +6,7 @@ import { followerInboxes } from '../../../controllers/follows';
 import { createNote } from '../../../controllers/notes';
 import { User } from '../../../entities/user';
 import { appendContext, renderCreate, renderNote } from '../../../helpers/activitypub/renderer';
+import { convertToHTML } from '../../../helpers/convert-to-html';
 import { verifyJWT } from '../../../helpers/jwt-async';
 import { renderURI } from '../../../helpers/render-uri';
 import { resolveOrNull } from '../../../helpers/suppressors';
@@ -25,7 +26,8 @@ export default async (ctx: Koa.Context) => {
   if (
     typeof text !== 'string' ||
     typeof token !== 'string' ||
-    (inReplyTo !== undefined && typeof inReplyTo !== 'string')
+    (inReplyTo !== undefined && typeof inReplyTo !== 'string') ||
+    text.trim() === ''
   ) {
     ctx.status = 400;
     return;
@@ -54,7 +56,8 @@ export default async (ctx: Koa.Context) => {
   );
 
   const uri = renderURI('users', user.username);
-  const activity = appendContext(renderCreate(uri, renderNote(note.id, note.createdAt, uri, note.content, inReplyTo)));
+  const content = convertToHTML(note.content);
+  const activity = appendContext(renderCreate(uri, renderNote(note.id, note.createdAt, uri, content, inReplyTo)));
 
   const inboxes = await followerInboxes(user.account.id);
 

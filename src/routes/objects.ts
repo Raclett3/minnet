@@ -72,7 +72,15 @@ router.get('/notes/:note', async ctx => {
 });
 
 const app = new Koa();
-app.use(router.routes());
-app.use(router.allowedMethods());
+app.use(async (ctx: Koa.ParameterizedContext<{}, Router.RouterParamContext<{}, {}>>, next) => {
+  const accepts = ctx.accepts('application/activity+json', 'application/ld+json', 'html');
+  if (typeof accepts === 'string' && accepts !== '' && !accepts.includes('html')) {
+    await router.routes()(ctx, async () => {
+      await router.allowedMethods()(ctx, next);
+    });
+  } else {
+    await next();
+  }
+});
 
 export default app;
