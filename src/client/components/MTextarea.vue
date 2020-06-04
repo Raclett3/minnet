@@ -2,7 +2,12 @@
   <div class="textarea">
     <p v-if="label" class="label">{{ label }}</p>
     <p>
-      <textarea :value="value" :type="type" @input="$emit('input', $event.target.value)" />
+      <textarea
+        :value="value"
+        :type="type"
+        @keydown.ctrl.enter="$emit('enter')"
+        @input="$emit('input', $event.target.value)"
+      />
     </p>
   </div>
 </template>
@@ -29,6 +34,7 @@ textarea {
   padding: 5px;
   margin: 0;
   width: calc(100% - 12px);
+  height: 5em;
   resize: vertical;
 }
 

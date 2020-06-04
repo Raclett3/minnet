@@ -1,7 +1,9 @@
 <template>
   <div>
     <p v-if="label" class="label">{{ label }}</p>
-    <p><input :value="value" :type="type" @input="$emit('input', $event.target.value)" /></p>
+    <p>
+      <input :value="value" :type="type" @keydown.enter="$emit('enter')" @input="$emit('input', $event.target.value)" />
+    </p>
   </div>
 </template>
 
