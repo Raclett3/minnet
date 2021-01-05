@@ -39,7 +39,7 @@
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
     "@vue/eslint-config-typescript": "5.0.2",
-    "axios": "0.19.2",
+    "axios": "0.21.1",
     "css-loader": "3.4.2",
     "eslint": "6.0.0",
     "eslint-config-prettier": "6.10.0",
